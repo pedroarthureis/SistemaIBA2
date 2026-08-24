@@ -54,12 +54,12 @@ O objetivo principal do sistema é centralizar e otimizar o gerenciamento de reg
 
 ## Integrantes da Equipe
 
-| Foto / Avatar | Nome | GitHub |
-| :---: | :--- | :---: |
-| | **Lucas da Silva Tolentino Campos** | [@lucastolentino](https://github me) |
+| | Nome |
+| :---: | 
+| | **Lucas da Silva Tolentino Campos** | — |
 | | **Pedro Arthur Reis** | — |
-| | **Paulo André Jr.** | — |
-| | **Guilherme Francisco** | — |
+| | **Paulo André Reis Jr.** | — |
+| | **Guilherme Francisco Honorato Parente** | — |
 
 ---
 
