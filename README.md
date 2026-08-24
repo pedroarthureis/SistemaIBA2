@@ -28,7 +28,7 @@ O objetivo principal do sistema é centralizar e otimizar o gerenciamento de reg
 - [x] **Gestão de Professores:** Registro de docentes e vínculo com disciplinas.
 - [x] **Gestão de Cursos e Matérias:** Organização de matrizes curriculares e disciplinas.
 - [x] **Lançamento e Consulta de Notas:** Acompanhamento do desempenho acadêmico.
-- [ ] *Novas funcionalidades em breve (veja o roadmap abaixo)*
+- [ ] *Novas funcionalidades em breve*
 
 ---
 
@@ -36,21 +36,13 @@ O objetivo principal do sistema é centralizar e otimizar o gerenciamento de reg
 
 *(Ajuste/adicione os ícones e tecnologias conforme a stack do seu projeto)*
 
-- **Backend:** Java / Spring Boot *(ou Node.js)*
-- **Frontend:** HTML5, CSS3, TypeScript / React
-- **Banco de Dados:** PostgreSQL / MySQL
+- **Backend:** Java / Spring Boot
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Banco de Dados:** PostgreSQL
 - **Controle de Versão:** Git & GitHub
 
 ---
 
-## Roadmap (Próximos Passos)
-
-- [ ] Refatoração e otimização de performance do backend
-- [ ] Implementação de controle de acesso e autenticação (JWT / Roles)
-- [ ] Criação de painéis/dashboards para alunos e professores
-- [ ] Relatórios analíticos de frequência e rendimento acadêmico
-
----
 
 ## Integrantes da Equipe
 
