@@ -55,16 +55,16 @@ O objetivo principal do sistema é centralizar e otimizar o gerenciamento de reg
 ## Integrantes da Equipe
 
 | | Nome |
-| :---: | 
-| | **Lucas da Silva Tolentino Campos** | — |
-| | **Pedro Arthur Reis** | — |
-| | **Paulo André Reis Jr.** | — |
-| | **Guilherme Francisco Honorato Parente** | — |
+| :---: | :--- |
+| - | **Lucas da Silva Tolentino Campos** |
+| - | **Pedro Arthur Reis** |
+| - | **Paulo André Reis Jr.** |
+| - | **Guilherme Francisco Honorato Parente** |
 
 ---
 
 <div align="center">
 
-Desenvolvido com 💙 pelo grupo de PFC — UniEvangélica
+Desenvolvido pelo grupo de PFC — UniEvangélica
 
 </div>
