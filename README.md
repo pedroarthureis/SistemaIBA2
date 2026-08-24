@@ -54,8 +54,6 @@ O objetivo principal do sistema é centralizar e otimizar o gerenciamento de reg
 
 ## Integrantes da Equipe
 
-| | Nome |
-| :---: | :--- |
 | - | **Lucas da Silva Tolentino Campos** |
 | - | **Pedro Arthur Reis** |
 | - | **Paulo André Reis Jr.** |
