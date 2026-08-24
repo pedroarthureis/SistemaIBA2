@@ -1,10 +1,70 @@
-PFC 7° Período UniEvangélica
+<div align="center">
 
-Sistema de gestão de Alunos, Professores, Matérias Cursos e Notas. 
-Versão a ser aprimorada. Expanão e novas funcionalidades em breve.
+# Sistema de Gestão Acadêmica
 
-Alunos: 
-Lucas da Silva Tolentino Campos
-Pedro Arthur Reis
-Paulo André Jr.
-Guilherme Franciso
+> **Projeto Final de Curso (PFC) — 7º Período | Engenharia de Software — UniEvangélica**
+
+![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow?style=for-the-badge)
+![Curso](https://img.shields.io/badge/Curso-Engenharia_de_Software-blue?style=for-the-badge)
+![Faculdade](https://img.shields.io/badge/Instituição-UniEvangélica-red?style=for-the-badge)
+
+</div>
+
+---
+
+## Sobre o Projeto
+
+O **Sistema de Gestão Acadêmica** é um software desenvolvido como Projeto Final de Curso (PFC) no 7º período da graduação em Engenharia de Software da **UniEvangélica**. 
+
+O objetivo principal do sistema é centralizar e otimizar o gerenciamento de registros educacionais, permitindo o controle eficiente de alunos, professores, disciplinas, cursos e avaliações/notas.
+
+> **Nota:** Esta é a versão inicial do projeto. A aplicação está em fase de aprimoramento, com novas funcionalidades e expansões planejadas no roadmap de desenvolvimento.
+
+---
+
+## Funcionalidades Principais
+
+- [x] **Gestão de Alunos:** Cadastro, consulta e controle de dados discentes.
+- [x] **Gestão de Professores:** Registro de docentes e vínculo com disciplinas.
+- [x] **Gestão de Cursos e Matérias:** Organização de matrizes curriculares e disciplinas.
+- [x] **Lançamento e Consulta de Notas:** Acompanhamento do desempenho acadêmico.
+- [ ] *Novas funcionalidades em breve (veja o roadmap abaixo)*
+
+---
+
+## Tecnologias Utilizadas
+
+*(Ajuste/adicione os ícones e tecnologias conforme a stack do seu projeto)*
+
+- **Backend:** Java / Spring Boot *(ou Node.js)*
+- **Frontend:** HTML5, CSS3, TypeScript / React
+- **Banco de Dados:** PostgreSQL / MySQL
+- **Controle de Versão:** Git & GitHub
+
+---
+
+## Roadmap (Próximos Passos)
+
+- [ ] Refatoração e otimização de performance do backend
+- [ ] Implementação de controle de acesso e autenticação (JWT / Roles)
+- [ ] Criação de painéis/dashboards para alunos e professores
+- [ ] Relatórios analíticos de frequência e rendimento acadêmico
+
+---
+
+## Integrantes da Equipe
+
+| Foto / Avatar | Nome | GitHub |
+| :---: | :--- | :---: |
+| | **Lucas da Silva Tolentino Campos** | [@lucastolentino](https://github me) |
+| | **Pedro Arthur Reis** | — |
+| | **Paulo André Jr.** | — |
+| | **Guilherme Francisco** | — |
+
+---
+
+<div align="center">
+
+Desenvolvido com 💙 pelo grupo de PFC — UniEvangélica
+
+</div>
