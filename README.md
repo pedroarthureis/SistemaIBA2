@@ -18,8 +18,6 @@ O **Sistema de Gestão Acadêmica** é um software desenvolvido como Projeto Fin
 
 O objetivo principal do sistema é centralizar e otimizar o gerenciamento de registros educacionais, permitindo o controle eficiente de alunos, professores, disciplinas, cursos e avaliações/notas.
 
-> **Nota:** Esta é a versão inicial do projeto. A aplicação está em fase de aprimoramento, com novas funcionalidades e expansões planejadas no roadmap de desenvolvimento.
-
 ---
 
 ## Funcionalidades Principais
