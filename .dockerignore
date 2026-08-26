@@ -1,0 +1,14 @@
+# Ignorar arquivos desnecessários
+.git
+.gitignore
+README.md
+*.log
+*.tmp
+.env
+.env.*
+target/
+.idea/
+*.iml
+.vscode/
+node_modules/
+.DS_Store
