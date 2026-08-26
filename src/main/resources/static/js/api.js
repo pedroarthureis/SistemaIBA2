@@ -1,7 +1,19 @@
 // ============================================
 // API CONFIGURATION
 // ============================================
-const API_BASE_URL = 'http://localhost:8181/api';
+
+// 🔥 DETECTA O AMBIENTE AUTOMATICAMENTE
+const API_BASE_URL = (() => {
+    // Se não for localhost, está em produção (Render)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        // No Render, o backend está no mesmo domínio
+        return `${window.location.origin}/api`;
+    }
+    // Desenvolvimento local
+    return 'http://localhost:8181/api';
+})();
+
+console.log('🔧 API_BASE_URL:', API_BASE_URL);
 
 // Helper para fazer requisições
 async function apiRequest(endpoint, method = 'GET', data = null) {
@@ -105,6 +117,18 @@ const NotaAPI = {
     getByMateria: (materiaId) => apiRequest(`/notas/materia/${materiaId}`),
     save: (data) => apiRequest('/notas', 'POST', data),
     delete: (id) => apiRequest(`/notas/${id}`, 'DELETE')
+};
+
+// ============================================
+// DOAÇÕES API
+// ============================================
+const DoacaoAPI = {
+    getAll: () => apiRequest('/doacoes'),
+    getById: (id) => apiRequest(`/doacoes/${id}`),
+    create: (data) => apiRequest('/doacoes', 'POST', data),
+    update: (id, data) => apiRequest(`/doacoes/${id}`, 'PUT', data),
+    delete: (id) => apiRequest(`/doacoes/${id}`, 'DELETE'),
+    getDashboard: () => apiRequest('/doacoes/dashboard')
 };
 
 // ============================================
