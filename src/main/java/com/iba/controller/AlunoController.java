@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/alunos")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AlunoController {
 

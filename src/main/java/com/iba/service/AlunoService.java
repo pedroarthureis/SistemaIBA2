@@ -176,13 +176,10 @@ public class AlunoService {
         AlunoModel aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
         
-        // Verificar se tem matrículas ativas
-        boolean temMatriculasAtivas = aluno.getMatriculas() != null && 
-                aluno.getMatriculas().stream()
-                    .anyMatch(m -> m.getStatus() == MatriculaModel.StatusMatricula.CURSANDO);
-        
-        if (temMatriculasAtivas) {
-            throw new RuntimeException("Não é possível excluir aluno com matrículas ativas");
+        // Histórico concluído também é documento acadêmico. Desligue o aluno
+        // em vez de apagar matrículas e notas por cascata.
+        if (aluno.getMatriculas() != null && !aluno.getMatriculas().isEmpty()) {
+            throw new IllegalArgumentException("Aluno possui histórico acadêmico. Altere o status em vez de excluir.");
         }
         
         alunoRepository.deleteById(id);

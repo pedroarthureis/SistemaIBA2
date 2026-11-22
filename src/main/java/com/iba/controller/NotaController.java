@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notas")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class NotaController {
 

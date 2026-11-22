@@ -1,5 +1,7 @@
 package com.iba.service;
 
+import com.iba.audit.AuditEvents;
+
 import com.iba.dto.DoacaoDTO;
 import com.iba.dto.DashboardDoacoesDTO;  // ← ADICIONAR ESTE IMPORT
 import com.iba.model.DoacaoModel;
@@ -79,7 +81,9 @@ public class DoacaoService {
         doacao.setStatus(DoacaoModel.StatusDoacao.valueOf(doacaoDTO.getStatus() != null ? doacaoDTO.getStatus() : "CONFIRMADA"));
         doacao.setObservacoes(doacaoDTO.getObservacoes());
 
+        validarDoacao(doacao);
         DoacaoModel saved = doacaoRepository.save(doacao);
+        AuditEvents.afterCommit("CREATE", "doacao", saved.getId());
         return toDTO(saved);
     }
 
@@ -98,7 +102,9 @@ public class DoacaoService {
         if (doacaoDTO.getStatus() != null) doacao.setStatus(DoacaoModel.StatusDoacao.valueOf(doacaoDTO.getStatus()));
         if (doacaoDTO.getObservacoes() != null) doacao.setObservacoes(doacaoDTO.getObservacoes());
 
+        validarDoacao(doacao);
         DoacaoModel saved = doacaoRepository.save(doacao);
+        AuditEvents.afterCommit("UPDATE", "doacao", saved.getId());
         return toDTO(saved);
     }
 
@@ -108,6 +114,21 @@ public class DoacaoService {
             throw new RuntimeException("Doação não encontrada");
         }
         doacaoRepository.deleteById(id);
+        AuditEvents.afterCommit("DELETE", "doacao", id);
+    }
+
+    private void validarDoacao(DoacaoModel doacao) {
+        if (doacao.getNomeDoador() == null || doacao.getNomeDoador().isBlank()) {
+            throw new IllegalArgumentException("Nome do doador é obrigatório");
+        }
+        if (doacao.getTipo() == null) throw new IllegalArgumentException("Tipo de doação é obrigatório");
+        if (doacao.getTipo() == DoacaoModel.TipoDoacao.DINHEIRO) {
+            if (doacao.getValor() == null || !Double.isFinite(doacao.getValor()) || doacao.getValor() <= 0) {
+                throw new IllegalArgumentException("Valor da doação deve ser maior que zero");
+            }
+        } else if (doacao.getDescricaoItem() == null || doacao.getDescricaoItem().isBlank()) {
+            throw new IllegalArgumentException("Descreva o item doado");
+        }
     }
 
     public DashboardDoacoesDTO getDashboardData() {

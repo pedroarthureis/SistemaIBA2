@@ -37,15 +37,28 @@ function formatCEP(cep) {
 // Formatar data para exibição
 function formatDate(dateString) {
     if (!dateString) return '';
+    // YYYY-MM-DD representa data civil, não um instante UTC.
+    const dateOnly = String(dateString).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (dateOnly) return `${dateOnly[3]}/${dateOnly[2]}/${dateOnly[1]}`;
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR');
+    return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('pt-BR');
 }
 
-// Formatar data para input date (YYYY-MM-DD)
 function formatDateInput(dateString) {
     if (!dateString) return '';
+    const dateOnly = String(dateString).match(/^(\d{4}-\d{2}-\d{2})/);
+    if (dateOnly) return dateOnly[1];
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    if (Number.isNaN(date.getTime())) return '';
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+}
+
+// Conteúdo recebido do usuário ou da API deve ser escapado antes de entrar em innerHTML.
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
 }
 
 // Formatar moeda
@@ -95,10 +108,10 @@ function calcularMedia(valores) {
 function showAlert(message, type = 'success') {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type}`;
-    alertDiv.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-        <span>${message}</span>
-    `;
+    alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>`;
+    const text = document.createElement('span');
+    text.textContent = String(message);
+    alertDiv.appendChild(text);
     
     const container = document.querySelector('.content-container');
     if (container) {
@@ -208,25 +221,24 @@ function populateSelect(selectElement, items, valueField, textField, defaultOpti
     });
 }
 
-// Exportar tabela para CSV
+// CSV conforme RFC 4180; protege também contra interpretação de fórmulas em planilhas.
+function csvCell(value) {
+    let text = String(value ?? '');
+    if (/^[\s]*[=+@-]/.test(text)) text = "'" + text;
+    return '"' + text.replace(/"/g, '""') + '"';
+}
+
 function exportToCSV(tableId, filename = 'export.csv') {
     const table = document.getElementById(tableId);
     if (!table) return;
-    
-    const rows = table.querySelectorAll('tr');
-    const csv = [];
-    
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('th, td');
-        const rowData = Array.from(cells).map(cell => cell.textContent.trim());
-        csv.push(rowData.join(','));
-    });
-    
-    const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+    const rows = Array.from(table.querySelectorAll('tr'));
+    const csv = rows.map(row => Array.from(row.querySelectorAll('th, td'))
+        .map(cell => csvCell(cell.textContent.trim())).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
 }

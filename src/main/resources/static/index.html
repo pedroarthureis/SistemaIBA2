@@ -14,35 +14,35 @@
             <p>Instituto Bíblico</p>
         </div>
         <div class="sidebar-menu">
-            <a class="menu-item" data-page="dashboard">
+            <a class="menu-item" data-page="dashboard" href="#dashboard">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="menu-item" data-page="alunos">
+            <a class="menu-item" data-page="alunos" href="#alunos">
                 <i class="fas fa-users"></i>
                 <span>Alunos</span>
             </a>
-            <a class="menu-item" data-page="cursos">
+            <a class="menu-item" data-page="cursos" href="#cursos">
                 <i class="fas fa-book"></i>
                 <span>Cursos</span>
             </a>
-            <a class="menu-item" data-page="materias">
+            <a class="menu-item" data-page="materias" href="#materias">
                 <i class="fas fa-chalkboard"></i>
                 <span>Matérias</span>
             </a>
-            <a class="menu-item" data-page="professores">
+            <a class="menu-item" data-page="professores" href="#professores">
                 <i class="fas fa-chalkboard-user"></i>
                 <span>Professores</span>
             </a>
-            <a class="menu-item" data-page="matriculas">
+            <a class="menu-item" data-page="matriculas" href="#matriculas">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Matrículas</span>
             </a>
-            <a class="menu-item" data-page="notas">
+            <a class="menu-item" data-page="notas" href="#notas">
                 <i class="fas fa-star"></i>
                 <span>Notas</span>
             </a>
-            <a class="menu-item" data-page="doacoes">
+            <a class="menu-item" data-page="doacoes" href="#doacoes">
                 <i class="fas fa-hand-holding-heart"></i>
                 <span>Doações</span>
             </a>
@@ -51,7 +51,7 @@
         </div>
     </div>
     
-    <button class="sidebar-toggle" id="sidebarToggle">
+    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Recolher ou expandir menu" aria-expanded="true">
         <i class="fas fa-bars"></i>
     </button>
     
@@ -66,7 +66,7 @@
             </div>
         </div>
         
-        <div class="content-container" id="contentContainer">
+        <div class="content-container" id="contentContainer" role="main" aria-live="polite">
             <div class="loading">
                 <div class="loading-spinner"></div>
             </div>
@@ -76,79 +76,78 @@
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script>
-        // Estado da sidebar
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('sidebarToggle');
-        
+        const contentContainer = document.getElementById('contentContainer');
+        const titleMap = {
+            dashboard: { title: 'Dashboard', desc: 'Visão geral do sistema' },
+            alunos: { title: 'Alunos', desc: 'Gerenciar cadastro de alunos' },
+            cursos: { title: 'Cursos', desc: 'Gerenciar cursos e matérias' },
+            materias: { title: 'Matérias', desc: 'Gerenciar disciplinas' },
+            professores: { title: 'Professores', desc: 'Gerenciar docentes' },
+            matriculas: { title: 'Matrículas', desc: 'Realizar matrículas de alunos' },
+            notas: { title: 'Notas', desc: 'Lançamento de notas por ciclo' },
+            doacoes: { title: 'Doações', desc: 'Gerenciar doações da instituição' }
+        };
+        let navigationId = 0;
+        let activeScript = null;
+
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
+            toggleBtn.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')));
         });
-        
-        // Carregar página
+
         async function loadPage(page) {
-            const contentContainer = document.getElementById('contentContainer');
-// No index.html, atualizar o titleMap:
-const titleMap = {
-    dashboard: { title: 'Dashboard', desc: 'Visão geral do sistema' },
-    alunos: { title: 'Alunos', desc: 'Gerenciar cadastro de alunos' },
-    cursos: { title: 'Cursos', desc: 'Gerenciar cursos e matérias' },
-    materias: { title: 'Matérias', desc: 'Gerenciar disciplinas' },
-    professores: { title: 'Professores', desc: 'Gerenciar docentes' },
-    matriculas: { title: 'Matrículas', desc: 'Realizar matrículas de alunos' },
-    notas: { title: 'Notas', desc: 'Lançamento de notas por ciclo' },
-    doacoes: { title: 'Doações', desc: 'Gerenciar doações da instituição' }  // ← ADICIONAR
-};
-            
-            document.getElementById('pageTitle').innerText = titleMap[page]?.title || page;
-            document.getElementById('pageDescription').innerText = titleMap[page]?.desc || '';
-            
+            if (!Object.hasOwn(titleMap, page)) page = 'dashboard';
+            const requestId = ++navigationId;
+            const detail = titleMap[page];
+            document.getElementById('pageTitle').textContent = detail.title;
+            document.getElementById('pageDescription').textContent = detail.desc;
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const active = item.dataset.page === page;
+                item.classList.toggle('active', active);
+                if (active) item.setAttribute('aria-current', 'page');
+                else item.removeAttribute('aria-current');
+            });
+            if (activeScript) { activeScript.remove(); activeScript = null; }
             contentContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
-            
+
             try {
                 const response = await fetch(`pages/${page}.html`);
                 if (!response.ok) throw new Error('Página não encontrada');
                 const html = await response.text();
+                // Impede que uma resposta lenta de uma página antiga substitua a atual.
+                if (requestId !== navigationId) return;
                 contentContainer.innerHTML = html;
-                
-                // Carregar script específico da página
-                const scriptId = `script-${page}`;
-                const existingScript = document.getElementById(scriptId);
-                if (existingScript) existingScript.remove();
-                
+
                 const script = document.createElement('script');
-                script.id = scriptId;
                 script.src = `js/pages/${page}.js`;
-                script.onload = () => {
-                    if (window[`init${page.charAt(0).toUpperCase() + page.slice(1)}`]) {
-                        window[`init${page.charAt(0).toUpperCase() + page.slice(1)}`]();
-                    }
+                script.id = `script-${page}`;
+                script.onerror = () => {
+                    if (requestId === navigationId) showAlert('Erro ao carregar funções da página.', 'error');
                 };
+                activeScript = script;
                 document.body.appendChild(script);
+                // Cada script de página executa a própria inicialização uma única vez.
             } catch (error) {
-                contentContainer.innerHTML = `
-                    <div class="content-panel">
-                        <div class="alert alert-error">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span>Erro ao carregar página: ${error.message}</span>
-                        </div>
-                    </div>
-                `;
+                if (requestId !== navigationId) return;
+                contentContainer.innerHTML = '';
+                const panel = document.createElement('div');
+                panel.className = 'content-panel';
+                const message = document.createElement('p');
+                message.className = 'alert alert-error';
+                message.textContent = `Não foi possível carregar a página. ${error.message}`;
+                panel.appendChild(message);
+                contentContainer.appendChild(panel);
             }
         }
-        
-        // Navegação
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                const page = item.dataset.page;
-                loadPage(page);
-            });
-        });
-        
-        // Carregar dashboard inicial
-        loadPage('dashboard');
+
+        function navigateFromHash() {
+            const page = window.location.hash.substring(1) || 'dashboard';
+            loadPage(page);
+        }
+        window.addEventListener('hashchange', navigateFromHash);
+        navigateFromHash();
     </script>
 </body>
 </html>

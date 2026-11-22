@@ -14,6 +14,9 @@ public interface MatriculaRepository extends JpaRepository<MatriculaModel, Long>
     List<MatriculaModel> findByAlunoId(Long alunoId);
     
     List<MatriculaModel> findByCursoId(Long cursoId);
+
+    @Query("SELECT DISTINCT m FROM MatriculaModel m JOIN m.materias mm WHERE mm.id = :materiaId")
+    List<MatriculaModel> findByMateriaSelecionada(@Param("materiaId") Long materiaId);
     
     Optional<MatriculaModel> findByAlunoIdAndAnoAndSemestre(Long alunoId, Integer ano, Integer semestre);
     

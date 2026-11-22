@@ -13,7 +13,7 @@
         </div>
         <div class="form-group">
             <label class="required">ANO</label>
-            <input type="number" id="ano" value="2024" required min="2000" max="2030">
+            <input type="number" id="ano" required min="2000" max="2100">
         </div>
         <div class="form-group">
             <label class="required">SEMESTRE</label>
@@ -21,6 +21,17 @@
                 <option value="1">1º Semestre</option>
                 <option value="2">2º Semestre</option>
             </select>
+        </div>
+        <div class="form-group subject-wide">
+            <label class="required" for="materiasMatricula">MATÉRIAS QUE ESTE ALUNO IRÁ CURSAR</label>
+            <div id="materiasMatricula" class="subject-picker" role="group" aria-label="Matérias desta matrícula">
+                <span class="empty-help">Selecione um curso para escolher as matérias.</span>
+            </div>
+            <small id="materiasMatriculaAviso" class="form-hint" aria-live="polite">A seleção pertence somente a esta matrícula, não aos demais alunos do curso.</small>
+            <div class="subject-tools">
+                <button type="button" id="selecionarTodasMaterias" class="btn btn-sm btn-outline">Selecionar todas</button>
+                <button type="button" id="limparMateriasMatricula" class="btn btn-sm btn-outline">Desmarcar todas</button>
+            </div>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
@@ -47,7 +58,7 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Aluno</th><th>Curso</th><th>Ano/Semestre</th><th>Data Matrícula</th><th>Status</th><th>Média</th><th>Ações</th>
+                    <th>Aluno</th><th>Curso</th><th>Matérias</th><th>Ano/Semestre</th><th>Data Matrícula</th><th>Status</th><th>Média</th><th>Ações</th>
                 </tr>
             </thead>
             <tbody id="matriculasList"></tbody>

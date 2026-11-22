@@ -1,3 +1,5 @@
+(function () {
+"use strict";
 // Dashboard Page Script
 
 async function initDashboard() {
@@ -20,7 +22,7 @@ async function initDashboard() {
             const percentual = (quantidade / totalAlunos * 100).toFixed(1);
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${curso}</strong></td>
+                <td><strong>${escapeHtml(curso)}</strong></td>
                 <td>${quantidade}</td>
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -44,7 +46,7 @@ async function initDashboard() {
             const statusClass = media >= 60 ? 'status-success' : media >= 40 ? 'status-warning' : 'status-danger';
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${curso.curso}</strong></td>
+                <td><strong>${escapeHtml(curso.curso)}</strong></td>
                 <td><span class="status-badge ${statusClass}">${media.toFixed(1)}</span></td>
                 <td>${status}</td>
             `;
@@ -58,9 +60,9 @@ async function initDashboard() {
         for (const aluno of (data.alunosRecentes || [])) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${aluno.matricula || aluno.id}</td>
-                <td><strong>${aluno.nome}</strong></td>
-                <td>${aluno.curso || 'Não matriculado'}</td>
+                <td>${escapeHtml(aluno.matricula || aluno.id)}</td>
+                <td><strong>${escapeHtml(aluno.nome)}</strong></td>
+                <td>${escapeHtml(aluno.curso || 'Não matriculado')}</td>
                 <td>${formatDate(aluno.dataCadastro)}</td>
             `;
             recentesBody.appendChild(tr);
@@ -72,6 +74,12 @@ async function initDashboard() {
                 const page = card.dataset.page;
                 document.querySelector(`.menu-item[data-page="${page}"]`).click();
             });
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
         });
         
     } catch (error) {
@@ -80,9 +88,14 @@ async function initDashboard() {
     }
 }
 
+
+// Funcoes usadas pelos botoes e buscas desta tela.
+Object.assign(window, { initDashboard });
+
 // Inicializar quando a página carregar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initDashboard);
 } else {
     initDashboard();
 }
+})();

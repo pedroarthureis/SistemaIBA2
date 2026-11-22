@@ -1,3 +1,5 @@
+(function () {
+"use strict";
 // Materias Page Script
 let materiasListData = [];
 
@@ -27,14 +29,14 @@ function renderizarMaterias(materias) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><strong>#${materia.id}</strong></td>
-            <td>${materia.nome}</td>
+            <td>${escapeHtml(materia.nome)}</td>
             <td><span class="status-badge status-info">${materia.quantidadeCursos || 0} curso(s)</span></td>
             <td><span class="status-badge ${getNotaClass(media)}">${media.toFixed(1)}</span></td>
             <td class="actions">
-                <button class="btn btn-sm btn-outline" onclick="editarMateria(${materia.id})" title="Editar">
+                <button class="btn btn-sm btn-outline" onclick="editarMateria(${materia.id})" title="Editar matéria" aria-label="Editar matéria ${materia.id}">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" onclick="removerMateria(${materia.id}, '${materia.nome}')" title="Remover">
+                <button class="btn btn-sm btn-danger" onclick="removerMateria(${materia.id})" title="Remover matéria" aria-label="Remover matéria ${materia.id}">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -94,8 +96,8 @@ async function editarMateria(id) {
     }
 }
 
-async function removerMateria(id, nome) {
-    if (confirm(`⚠️ Remover a matéria "${nome}"?\n\nTodas as notas vinculadas também serão removidas.`)) {
+async function removerMateria(id, nome = "este registro") {
+    if (confirm(`⚠️ Remover a matéria "${nome}"?\n\nNão é possível excluir matérias vinculadas a cursos ou com notas registradas.`)) {
         try {
             await MateriaAPI.delete(id);
             showAlert('Matéria removida com sucesso!');
@@ -114,6 +116,10 @@ function limparFormMateria() {
     if (nomeInput) nomeInput.value = '';
 }
 
+
+// Funcoes usadas pelos botoes e buscas desta tela.
+Object.assign(window, { carregarMaterias, buscarMaterias, salvarMateria, editarMateria, removerMateria, limparFormMateria });
+
 // Event Listeners
 const materiaForm = document.getElementById('materiaForm');
 if (materiaForm) {
@@ -124,3 +130,4 @@ if (materiaForm) {
 if (document.getElementById('materiasList')) {
     carregarMaterias();
 }
+})();
