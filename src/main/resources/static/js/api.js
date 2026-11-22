@@ -24,6 +24,10 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         }
     };
     
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+        options.headers['X-IBA-Request'] = '1';
+    }
+
     if (data) {
         options.body = JSON.stringify(data);
     }

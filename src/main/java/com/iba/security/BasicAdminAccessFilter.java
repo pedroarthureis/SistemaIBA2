@@ -57,7 +57,14 @@ public class BasicAdminAccessFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Origem não autorizada"); return;
             }
             String origin = request.getHeader("Origin");
-            if (origin != null && !sameOrigin(origin, request)) {
+            // Aceita chamadas do próprio frontend quando o proxy reescreve Origin.
+            // Sec-Fetch-Site é definido pelo navegador; o cabeçalho personalizado
+            // impede que formulários cross-site usem esta exceção.
+            boolean chamadaDoFrontend = "same-origin".equalsIgnoreCase(fetchSite)
+                && "1".equals(request.getHeader("X-IBA-Request"))
+                && request.getRequestURI().startsWith(request.getContextPath() + "/api/");
+
+            if (origin != null && !sameOrigin(origin, request) && !chamadaDoFrontend) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Origem não autorizada"); return;
             }
         }
