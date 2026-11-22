@@ -13,7 +13,7 @@ const API_BASE_URL = (() => {
     return 'http://localhost:8181/api';
 })();
 
-console.log('🔧 API_BASE_URL:', API_BASE_URL);
+
 
 // Helper para fazer requisições
 async function apiRequest(endpoint, method = 'GET', data = null) {
@@ -24,6 +24,10 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         }
     };
     
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+        options.headers['X-IBA-Request'] = '1';
+    }
+
     if (data) {
         options.body = JSON.stringify(data);
     }
@@ -32,8 +36,18 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
         
         if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error || `Erro ${response.status}`);
+            const raw = await response.text();
+            let errorMessage = `Erro HTTP ${response.status}`;
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (typeof parsed.message === 'string') errorMessage = parsed.message;
+                } catch (_) {
+                    // Mensagens não JSON não devem injetar HTML no alerta.
+                    errorMessage = raw.slice(0, 250);
+                }
+            }
+            throw new Error(errorMessage);
         }
         
         if (method === 'DELETE' || response.status === 204) {
@@ -103,6 +117,7 @@ const MatriculaAPI = {
     getByCursoAndPeriodo: (cursoId, ano, semestre) => apiRequest(`/matriculas/curso/${cursoId}/ano/${ano}/semestre/${semestre}`),
     getAtivasByCurso: (cursoId) => apiRequest(`/matriculas/curso/${cursoId}/ativas`),
     create: (data) => apiRequest('/matriculas', 'POST', data),
+    updateMaterias: (id, ids) => apiRequest(`/matriculas/${id}/materias`, 'PUT', ids),
     updateStatus: (id, status) => apiRequest(`/matriculas/${id}/status?status=${status}`, 'PATCH'),
     delete: (id) => apiRequest(`/matriculas/${id}`, 'DELETE')
 };

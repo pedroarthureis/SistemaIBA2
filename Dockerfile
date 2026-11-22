@@ -27,8 +27,8 @@ RUN ./mvnw package -DskipTests
 EXPOSE 8181
 
 # Healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8181/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT:-8181}/" >/dev/null || exit 1
 
 # Comando para rodar a aplicação
 ENTRYPOINT ["java", "-jar", "target/SistemaIBA-0.0.1-SNAPSHOT.jar"]

@@ -8,7 +8,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/endereco")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class EnderecoController {
 

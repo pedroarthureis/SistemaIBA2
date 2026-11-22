@@ -25,12 +25,39 @@
     <div class="form-grid" id="alunoInfo"></div>
 </div>
 
+<div id="vinculoMateriaPanel" class="content-panel" hidden>
+    <div class="panel-header">
+        <h3><i class="fas fa-link"></i> Matérias do curso</h3>
+    </div>
+    <p id="vinculoMateriaMensagem" class="help-text">Para lançar uma nota, primeiro vincule a matéria ao curso desta matrícula.</p>
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="novaMateriaVinculo">VINCULAR MATÉRIA JÁ CADASTRADA</label>
+            <select id="novaMateriaVinculo"><option value="">Selecione uma matéria</option></select>
+            <small>Essa vinculação vale para o curso e para todas as matrículas desse curso.</small>
+        </div>
+        <div class="form-actions">
+            <button type="button" id="adicionarMateriaAoCurso" class="btn btn-primary"><i class="fas fa-link"></i> Vincular ao curso</button>
+        </div>
+    </div>
+    <p><small>A matéria ainda não foi cadastrada? <a href="#materias">Cadastrar matéria</a>. Depois, volte para vincular.</small></p>
+</div>
+
+<div class="content-panel">
+    <div class="section-heading">
+        <div><h3><i class="fas fa-list-check"></i> Matérias deste aluno</h3>
+        <p class="form-hint">As notas são lançadas somente nas disciplinas selecionadas nesta matrícula.</p></div>
+        <button type="button" class="btn btn-sm btn-outline" id="editarGradeAluno" hidden>Editar matérias da matrícula</button>
+    </div>
+</div>
+
 <div class="content-panel">
     <div class="panel-header">
         <h3><i class="fas fa-star"></i> Lançamento de Notas</h3>
     </div>
 
     <form id="notaForm" class="form-grid">
+        <p id="notaFormAviso" class="help-text" style="grid-column: 1 / -1;">Selecione uma matrícula para consultar suas matérias.</p>
         <div class="form-group">
             <label class="required">MATÉRIA</label>
             <select id="materiaNota" required>
@@ -62,7 +89,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" disabled>
                 <i class="fas fa-save"></i> Salvar Nota
             </button>
         </div>

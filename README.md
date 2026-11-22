@@ -33,3 +33,23 @@ Desenvolver um sistema web para auxiliar na gestão acadêmica e administrativa 
 - **Paulo André Reis Junior** — 2320074
 - **Guilherme Francisco Honorato Parente** — 2120402
 - **Athos Lial Passos** — 2320071
+
+## Estrutura e execução de testes
+
+O projeto utiliza Java, Spring Boot, PostgreSQL, HTML, CSS e JavaScript.
+As disciplinas disponíveis pertencem à grade do curso, enquanto a seleção de
+disciplinas cursadas pode ser definida em cada matrícula.
+
+**Verificações automatizadas:**
+
+```bash
+./mvnw clean verify
+node --test tests/frontend/*.test.cjs
+```
+
+Os cenários manuais estão organizados em `CHECKLIST_TESTES_MANUAIS.md`.
+Consulte `docs/ORIENTACOES_TECNICAS.md` para configurações de homologação,
+limitações de segurança e cuidados com o banco de dados.
+
+**Atenção:** antes de integrar alterações na branch principal ou publicar no
+Render, validar o esquema PostgreSQL e preparar backup com restauração testada.

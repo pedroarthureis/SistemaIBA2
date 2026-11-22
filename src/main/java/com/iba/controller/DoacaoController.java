@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/doacoes")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class DoacaoController {
 

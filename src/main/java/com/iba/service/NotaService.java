@@ -1,5 +1,7 @@
 package com.iba.service;
 
+import com.iba.audit.AuditEvents;
+
 import com.iba.dto.NotaDTO;
 import com.iba.model.MatriculaModel;
 import com.iba.model.MateriaModel;
@@ -65,15 +67,32 @@ public class NotaService {
 
     @Transactional
     public NotaDTO save(NotaDTO notaDTO) {
+        // Rejeitar dados invalidos antes de consultar ou alterar registros.
+        if (notaDTO == null || notaDTO.getMatriculaId() == null || notaDTO.getMateriaId() == null) {
+            throw new IllegalArgumentException("Matrícula e matéria são obrigatórias");
+        }
+        if (notaDTO.getCiclo() == null || notaDTO.getCiclo() < 1 || notaDTO.getCiclo() > 3) {
+            throw new IllegalArgumentException("Ciclo deve estar entre 1 e 3");
+        }
+        if (notaDTO.getValor() == null || !Double.isFinite(notaDTO.getValor())
+                || notaDTO.getValor() < 0 || notaDTO.getValor() > 100) {
+            throw new IllegalArgumentException("Nota deve estar entre 0 e 100");
+        }
+
         MatriculaModel matricula = matriculaRepository.findById(notaDTO.getMatriculaId())
                 .orElseThrow(() -> new RuntimeException("Matrícula não encontrada"));
         
         MateriaModel materia = materiaRepository.findById(notaDTO.getMateriaId())
                 .orElseThrow(() -> new RuntimeException("Matéria não encontrada"));
 
-        // Validar nota entre 0 e 100
-        if (notaDTO.getValor() < 0 || notaDTO.getValor() > 100) {
-            throw new RuntimeException("Nota deve estar entre 0 e 100");
+        // A matéria precisa estar vinculada ao curso da matrícula. Validar no servidor
+        // impede notas órfãs e não depende de uma seleção correta no navegador.
+        if (matricula.getMateriasEfetivas() == null ||
+                matricula.getMateriasEfetivas().stream().noneMatch(m -> m.getId().equals(materia.getId()))) {
+            throw new IllegalArgumentException("Esta matéria não está vinculada à matrícula deste aluno. Selecione-a nas matérias da matrícula.");
+        }
+        if (matricula.getStatus() == MatriculaModel.StatusMatricula.TRANCADA) {
+            throw new IllegalArgumentException("Não é possível lançar notas para matrícula trancada");
         }
 
         NotaModel nota = notaRepository.findByMatriculaIdAndMateriaIdAndCiclo(
@@ -86,46 +105,55 @@ public class NotaService {
         nota.setMateria(materia);
         nota.setDataLancamento(LocalDate.now());
 
-        NotaModel saved = notaRepository.save(nota);
+        NotaModel saved = notaRepository.saveAndFlush(nota);
         
         // Verificar se todas as notas do período foram lançadas e atualizar status
-        verificarConclusaoPeriodo(matricula);
-        
+        recalcularStatus(matricula);
+        AuditEvents.afterCommit("UPSERT", "nota", saved.getId());
         return toDTO(saved);
     }
     
-    private void verificarConclusaoPeriodo(MatriculaModel matricula) {
-        List<MateriaModel> materiasCurso = matricula.getCurso().getMaterias();
-        List<NotaModel> notas = matricula.getNotas();
-        
-        boolean todasMateriasCompletas = true;
-        for (MateriaModel materia : materiasCurso) {
-            long ciclosLancados = notas.stream()
-                    .filter(n -> n.getMateria().getId().equals(materia.getId()))
-                    .count();
-            if (ciclosLancados < 3) {
-                todasMateriasCompletas = false;
-                break;
+    // Consulta as notas atualizadas após o save, evitando coleções JPA desatualizadas.
+    public void recalcularStatus(MatriculaModel matricula) {
+        if (matricula.getStatus() == MatriculaModel.StatusMatricula.TRANCADA) return;
+        List<MateriaModel> materias = matricula.getMateriasEfetivas();
+        List<NotaModel> notas = notaRepository.findByMatriculaId(matricula.getId());
+        if (materias == null || materias.isEmpty()) {
+            matricula.setStatus(MatriculaModel.StatusMatricula.CURSANDO);
+        } else {
+            boolean completo = true;
+            boolean todasAprovadas = true;
+            for (MateriaModel materia : materias) {
+                java.util.Map<Integer, Double> ciclos = new java.util.HashMap<>();
+                for (NotaModel nota : notas) {
+                    if (nota.getMateria().getId().equals(materia.getId()) &&
+                            nota.getCiclo() >= 1 && nota.getCiclo() <= 3) {
+                        ciclos.put(nota.getCiclo(), nota.getValor());
+                    }
+                }
+                if (ciclos.size() < 3) {
+                    completo = false;
+                } else if (ciclos.values().stream().mapToDouble(Double::doubleValue).average().orElse(0) < 60.0) {
+                    todasAprovadas = false;
+                }
             }
+            matricula.setStatus(!completo ? MatriculaModel.StatusMatricula.CURSANDO :
+                    (todasAprovadas ? MatriculaModel.StatusMatricula.APROVADO : MatriculaModel.StatusMatricula.REPROVADO));
         }
-        
-        if (todasMateriasCompletas) {
-            double mediaFinal = matricula.getMediaFinal();
-            // Média para aprovação: 60 (alterado de 70 para 60)
-            if (mediaFinal >= 60.0) {
-                matricula.setStatus(MatriculaModel.StatusMatricula.APROVADO);
-            } else {
-                matricula.setStatus(MatriculaModel.StatusMatricula.REPROVADO);
-            }
-            matriculaRepository.save(matricula);
-        }
+        matriculaRepository.save(matricula);
     }
 
     @Transactional
     public void delete(Long id) {
-        if (!notaRepository.existsById(id)) {
-            throw new RuntimeException("Nota não encontrada");
+        NotaModel nota = notaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nota não encontrada"));
+        MatriculaModel matricula = nota.getMatricula();
+        if (matricula.getStatus() == MatriculaModel.StatusMatricula.TRANCADA) {
+            throw new IllegalArgumentException("Não é possível modificar notas de matrícula trancada");
         }
-        notaRepository.deleteById(id);
+        notaRepository.delete(nota);
+        notaRepository.flush();
+        recalcularStatus(matricula);
+        AuditEvents.afterCommit("DELETE", "nota", id);
     }
 }

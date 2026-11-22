@@ -1,0 +1,44 @@
+name: Verificacao automatica - Sistema IBA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  testes-java:
+    name: Testes unitarios Java
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+      - name: Java 17 e cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Preparar Maven Wrapper
+        run: chmod +x ./mvnw
+      - name: Testes e verificacao Maven
+        run: ./mvnw --batch-mode clean verify
+
+  testes-frontend:
+    name: Testes de utilitarios JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxe dos scripts
+        run: |
+          find src/main/resources/static/js -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Executar testes de frontend
+        run: node --test tests/frontend/*.test.cjs

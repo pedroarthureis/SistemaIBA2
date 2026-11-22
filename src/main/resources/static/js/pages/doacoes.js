@@ -1,3 +1,5 @@
+(function () {
+"use strict";
 // Doacoes Page Script
 
 async function carregarDoacoes() {
@@ -18,11 +20,11 @@ async function carregarDoacoes() {
             
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${doacao.nomeDoador}</strong><br><small>${doacao.email || ''}</small></td>
-                <td>${doacao.tipoDescricao}</td>
-                <td>${valorItem}</td>
-                <td>${doacao.dataFormatada}</td>
-                <td><span class="status-badge ${getStatusClass(doacao.status)}">${doacao.statusDescricao}</span></td>
+                <td><strong>${escapeHtml(doacao.nomeDoador)}</strong><br><small>${escapeHtml(doacao.email || '')}</small></td>
+                <td>${escapeHtml(doacao.tipoDescricao)}</td>
+                <td>${escapeHtml(valorItem)}</td>
+                <td>${escapeHtml(doacao.dataFormatada)}</td>
+                <td><span class="status-badge ${getStatusClass(doacao.status)}">${escapeHtml(doacao.statusDescricao)}</span></td>
                 <td class="actions">
                     <button class="btn btn-sm btn-outline" onclick="verDoacao(${doacao.id})" title="Visualizar">
                         <i class="fas fa-eye"></i>
@@ -59,7 +61,7 @@ async function carregarDashboardDoacoes() {
             const percentual = (quantidade / total * 100).toFixed(1);
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${tipo}</td>
+                <td>${escapeHtml(tipo)}</td>
                 <td>${quantidade}</td>
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -154,14 +156,14 @@ async function verDoacao(id) {
         
         modalBody.innerHTML = `
             <div class="form-grid">
-                <div><strong>Doador:</strong><br>${doacao.nomeDoador}</div>
-                <div><strong>Email:</strong><br>${doacao.email || '-'}</div>
-                <div><strong>Telefone:</strong><br>${doacao.telefone || '-'}</div>
-                <div><strong>Tipo:</strong><br>${doacao.tipoDescricao}</div>
-                <div><strong>${doacao.tipo === 'DINHEIRO' ? 'Valor:' : 'Item:'}</strong><br>${doacao.tipo === 'DINHEIRO' ? `R$ ${doacao.valor?.toFixed(2)}` : doacao.descricaoItem || '-'}</div>
-                <div><strong>Data:</strong><br>${doacao.dataFormatada}</div>
-                <div><strong>Status:</strong><br><span class="status-badge ${getStatusClass(doacao.status)}">${doacao.statusDescricao}</span></div>
-                <div><strong>Observações:</strong><br>${doacao.observacoes || '-'}</div>
+                <div><strong>Doador:</strong><br>${escapeHtml(doacao.nomeDoador)}</div>
+                <div><strong>Email:</strong><br>${escapeHtml(doacao.email || '-')}</div>
+                <div><strong>Telefone:</strong><br>${escapeHtml(doacao.telefone || '-')}</div>
+                <div><strong>Tipo:</strong><br>${escapeHtml(doacao.tipoDescricao)}</div>
+                <div><strong>${doacao.tipo === 'DINHEIRO' ? 'Valor:' : 'Item:'}</strong><br>${doacao.tipo === 'DINHEIRO' ? `R$ ${doacao.valor?.toFixed(2)}` : escapeHtml(doacao.descricaoItem || '-')}</div>
+                <div><strong>Data:</strong><br>${escapeHtml(doacao.dataFormatada)}</div>
+                <div><strong>Status:</strong><br><span class="status-badge ${getStatusClass(doacao.status)}">${escapeHtml(doacao.statusDescricao)}</span></div>
+                <div><strong>Observações:</strong><br>${escapeHtml(doacao.observacoes || '-')}</div>
             </div>
         `;
         
@@ -231,12 +233,17 @@ function fecharModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 }
 
+
+// Funcoes usadas pelos botoes e buscas desta tela.
+Object.assign(window, { carregarDoacoes, carregarDashboardDoacoes, toggleValorItem, salvarDoacao, verDoacao, editarDoacao, editarDoacaoFromModal, removerDoacao, limparFormDoacao, fecharModal });
+
 // Event Listeners
 document.getElementById('doacaoForm').addEventListener('submit', salvarDoacao);
 document.getElementById('tipoDoacao').addEventListener('change', toggleValorItem);
-document.getElementById('telefone').addEventListener('input', (e) => formatTelefone(e.target.value));
+document.getElementById('telefone').addEventListener('input', (e) => { e.target.value = formatTelefone(e.target.value); });
 
 // Adicionar ao menu no index.html (você precisará adicionar manualmente)
 // Inicializar
 carregarDoacoes();
 carregarDashboardDoacoes();
+})();

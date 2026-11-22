@@ -1,3 +1,5 @@
+(function () {
+"use strict";
 // Professores Page Script
 let todosProfessores = [];
 
@@ -24,10 +26,10 @@ function renderizarProfessores(professores) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${prof.id}</td>
-            <td><strong>${prof.nome}</strong></td>
-            <td>${formatCPF(prof.cpf)}</td>
-            <td>${prof.area || '<span style="color: #999;">Não informada</span>'}</td>
-            <td><span class="status-badge ${getStatusClass(prof.status)}">${prof.status || 'ATIVO'}</span></td>
+            <td><strong>${escapeHtml(prof.nome)}</strong></td>
+            <td>${escapeHtml(formatCPF(prof.cpf))}</td>
+            <td>${escapeHtml(prof.area || 'Não informada')}</td>
+            <td><span class="status-badge ${getStatusClass(prof.status)}">${escapeHtml(prof.status || 'ATIVO')}</span></td>
             <td class="actions">
                 <button class="btn btn-sm btn-outline" onclick="verProfessor(${prof.id})" title="Visualizar">
                     <i class="fas fa-eye"></i>
@@ -35,7 +37,7 @@ function renderizarProfessores(professores) {
                 <button class="btn btn-sm btn-outline" onclick="editarProfessor(${prof.id})" title="Editar">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" onclick="removerProfessor(${prof.id}, '${prof.nome}')" title="Remover">
+                <button class="btn btn-sm btn-danger" onclick="removerProfessor(${prof.id})" title="Remover">
                     <i class="fas fa-trash"></i>
                 </button>
              </td>
@@ -144,20 +146,20 @@ async function verProfessor(id) {
         modalBody.innerHTML = `
             <div class="form-grid">
                 <div><strong>ID:</strong><br>${prof.id}</div>
-                <div><strong>Nome:</strong><br>${prof.nome}</div>
-                <div><strong>CPF:</strong><br>${formatCPF(prof.cpf)}</div>
-                <div><strong>RG:</strong><br>${prof.rg || '-'}</div>
-                <div><strong>Email:</strong><br>${prof.email || '-'}</div>
-                <div><strong>Telefone:</strong><br>${prof.telefone || '-'}</div>
+                <div><strong>Nome:</strong><br>${escapeHtml(prof.nome)}</div>
+                <div><strong>CPF:</strong><br>${escapeHtml(formatCPF(prof.cpf))}</div>
+                <div><strong>RG:</strong><br>${escapeHtml(prof.rg || '-')}</div>
+                <div><strong>Email:</strong><br>${escapeHtml(prof.email || '-')}</div>
+                <div><strong>Telefone:</strong><br>${escapeHtml(prof.telefone || '-')}</div>
                 <div><strong>Data Nascimento:</strong><br>${formatDate(prof.dataNascimento)}</div>
                 <div><strong>Idade:</strong><br>${prof.idade || '-'} anos</div>
-                <div><strong>Endereço:</strong><br>${prof.endereco || '-'}, ${prof.numero || ''} - ${prof.bairro || ''}</div>
-                <div><strong>Cidade/UF:</strong><br>${prof.cidade || ''}/${prof.estado || ''}</div>
-                <div><strong>CEP:</strong><br>${formatCEP(prof.cep || '')}</div>
-                <div><strong>Área:</strong><br>${prof.area || '-'}</div>
-                <div><strong>Especialização:</strong><br>${prof.especializacao || '-'}</div>
+                <div><strong>Endereço:</strong><br>${escapeHtml(prof.endereco || '-')}, ${escapeHtml(prof.numero || '')} - ${escapeHtml(prof.bairro || '')}</div>
+                <div><strong>Cidade/UF:</strong><br>${escapeHtml(prof.cidade || '')}/${escapeHtml(prof.estado || '')}</div>
+                <div><strong>CEP:</strong><br>${escapeHtml(formatCEP(prof.cep || ''))}</div>
+                <div><strong>Área:</strong><br>${escapeHtml(prof.area || '-')}</div>
+                <div><strong>Especialização:</strong><br>${escapeHtml(prof.especializacao || '-')}</div>
                 <div><strong>Data Contratação:</strong><br>${formatDate(prof.dataContratacao)}</div>
-                <div><strong>Status:</strong><br><span class="status-badge ${getStatusClass(prof.status)}">${prof.status || 'ATIVO'}</span></div>
+                <div><strong>Status:</strong><br><span class="status-badge ${getStatusClass(prof.status)}">${escapeHtml(prof.status || 'ATIVO')}</span></div>
             </div>
         `;
         document.getElementById('professorModal').classList.add('active');
@@ -166,7 +168,7 @@ async function verProfessor(id) {
     }
 }
 
-async function removerProfessor(id, nome) {
+async function removerProfessor(id, nome = "este registro") {
     if (confirm(`⚠️ Remover o professor "${nome}"?`)) {
         try {
             await ProfessorAPI.delete(id);
@@ -198,11 +200,16 @@ function fecharModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 }
 
+
+// Funcoes usadas pelos botoes e buscas desta tela.
+Object.assign(window, { carregarProfessores, buscarProfessores, salvarProfessor, editarProfessor, verProfessor, removerProfessor, buscarCepProfessor, limparFormProfessor, fecharModal });
+
 // Event Listeners
 document.getElementById('professorForm').addEventListener('submit', salvarProfessor);
-document.getElementById('cpf').addEventListener('input', (e) => formatCPF(e.target.value));
-document.getElementById('telefone').addEventListener('input', (e) => formatTelefone(e.target.value));
-document.getElementById('cep').addEventListener('input', (e) => formatCEP(e.target.value));
+document.getElementById('cpf').addEventListener('input', (e) => { e.target.value = formatCPF(e.target.value); });
+document.getElementById('telefone').addEventListener('input', (e) => { e.target.value = formatTelefone(e.target.value); });
+document.getElementById('cep').addEventListener('input', (e) => { e.target.value = formatCEP(e.target.value); });
 
 // Inicializar
 carregarProfessores();
+})();

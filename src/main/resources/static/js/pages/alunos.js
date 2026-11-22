@@ -1,3 +1,5 @@
+(function () {
+"use strict";
 // Alunos Page Script
 
 async function carregarAlunos() {
@@ -15,11 +17,11 @@ async function carregarAlunos() {
             const cursoAtual = aluno.cursoAtual?.nome || 'Não matriculado';
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${aluno.matricula || aluno.id}</strong></td>
-                <td>${aluno.nome}</td>
-                <td>${formatCPF(aluno.cpf || '')}</td>
-                <td>${cursoAtual}</td>
-                <td><span class="status-badge ${getStatusClass(aluno.status)}">${aluno.status || 'ATIVO'}</span></td>
+                <td><strong>${escapeHtml(aluno.matricula || aluno.id)}</strong></td>
+                <td>${escapeHtml(aluno.nome)}</td>
+                <td>${escapeHtml(formatCPF(aluno.cpf || ''))}</td>
+                <td>${escapeHtml(cursoAtual)}</td>
+                <td><span class="status-badge ${getStatusClass(aluno.status)}">${escapeHtml(aluno.status || 'ATIVO')}</span></td>
                 <td class="actions">
                     <button class="btn btn-sm btn-outline" onclick="verAluno(${aluno.id})" title="Visualizar">
                         <i class="fas fa-eye"></i>
@@ -55,11 +57,11 @@ async function buscarAlunos() {
             const cursoAtual = aluno.cursoAtual?.nome || 'Não matriculado';
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${aluno.matricula || aluno.id}</td>
-                <td>${aluno.nome}</td>
-                <td>${formatCPF(aluno.cpf || '')}</td>
-                <td>${cursoAtual}</td>
-                <td><span class="status-badge ${getStatusClass(aluno.status)}">${aluno.status || 'ATIVO'}</span></td>
+                <td>${escapeHtml(aluno.matricula || aluno.id)}</td>
+                <td>${escapeHtml(aluno.nome)}</td>
+                <td>${escapeHtml(formatCPF(aluno.cpf || ''))}</td>
+                <td>${escapeHtml(cursoAtual)}</td>
+                <td><span class="status-badge ${getStatusClass(aluno.status)}">${escapeHtml(aluno.status || 'ATIVO')}</span></td>
                 <td class="actions">
                     <button class="btn btn-sm btn-outline" onclick="verAluno(${aluno.id})"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-sm btn-outline" onclick="editarAluno(${aluno.id})"><i class="fas fa-edit"></i></button>
@@ -151,22 +153,22 @@ async function verAluno(id) {
         const modalBody = document.getElementById('alunoDetalhes');
         modalBody.innerHTML = `
             <div class="form-grid">
-                <div><strong>Matrícula:</strong><br>${aluno.matricula || aluno.id}</div>
-                <div><strong>Nome:</strong><br>${aluno.nome}</div>
-                <div><strong>CPF:</strong><br>${formatCPF(aluno.cpf || '')}</div>
-                <div><strong>RG:</strong><br>${aluno.rg || '-'}</div>
-                <div><strong>Email:</strong><br>${aluno.email || '-'}</div>
-                <div><strong>Telefone:</strong><br>${aluno.telefone || '-'}</div>
+                <div><strong>Matrícula:</strong><br>${escapeHtml(aluno.matricula || aluno.id)}</div>
+                <div><strong>Nome:</strong><br>${escapeHtml(aluno.nome)}</div>
+                <div><strong>CPF:</strong><br>${escapeHtml(formatCPF(aluno.cpf || ''))}</div>
+                <div><strong>RG:</strong><br>${escapeHtml(aluno.rg || '-')}</div>
+                <div><strong>Email:</strong><br>${escapeHtml(aluno.email || '-')}</div>
+                <div><strong>Telefone:</strong><br>${escapeHtml(aluno.telefone || '-')}</div>
                 <div><strong>Data Nascimento:</strong><br>${formatDate(aluno.dataNascimento)}</div>
                 <div><strong>Idade:</strong><br>${aluno.idade || '-'} anos</div>
-                <div><strong>Naturalidade:</strong><br>${aluno.naturalidade || '-'}</div>
-                <div><strong>Pai:</strong><br>${aluno.nomePai || '-'}</div>
-                <div><strong>Mãe:</strong><br>${aluno.nomeMae || '-'}</div>
-                <div><strong>Endereço:</strong><br>${aluno.endereco || '-'}, ${aluno.numero || ''} - ${aluno.bairro || ''}</div>
-                <div><strong>Cidade/UF:</strong><br>${aluno.cidade || ''}/${aluno.estado || ''}</div>
-                <div><strong>CEP:</strong><br>${formatCEP(aluno.cep || '')}</div>
+                <div><strong>Naturalidade:</strong><br>${escapeHtml(aluno.naturalidade || '-')}</div>
+                <div><strong>Pai:</strong><br>${escapeHtml(aluno.nomePai || '-')}</div>
+                <div><strong>Mãe:</strong><br>${escapeHtml(aluno.nomeMae || '-')}</div>
+                <div><strong>Endereço:</strong><br>${escapeHtml(aluno.endereco || '-')}, ${escapeHtml(aluno.numero || '')} - ${escapeHtml(aluno.bairro || '')}</div>
+                <div><strong>Cidade/UF:</strong><br>${escapeHtml(aluno.cidade || '')}/${escapeHtml(aluno.estado || '')}</div>
+                <div><strong>CEP:</strong><br>${escapeHtml(formatCEP(aluno.cep || ''))}</div>
                 <div><strong>Data Cadastro:</strong><br>${formatDate(aluno.dataCadastro)}</div>
-                <div><strong>Status:</strong><br><span class="status-badge ${getStatusClass(aluno.status)}">${aluno.status || 'ATIVO'}</span></div>
+                <div><strong>Status:</strong><br><span class="status-badge ${getStatusClass(aluno.status)}">${escapeHtml(aluno.status || 'ATIVO')}</span></div>
             </div>
             <hr style="margin: 15px 0">
             <h4>Histórico de Matrículas</h4>
@@ -178,17 +180,17 @@ async function verAluno(id) {
                     <tbody>
                         ${matriculas.map(m => `
                             <tr>
-                                <td>${m.cursoNome}</td>
+                                <td>${escapeHtml(m.cursoNome)}</td>
                                 <td>${m.ano}</td>
                                 <td>${m.semestre}º</td>
-                                <td><span class="status-badge ${getStatusClass(m.status)}">${m.status}</span></td>
+                                <td><span class="status-badge ${getStatusClass(m.status)}">${escapeHtml(m.status)}</span></td>
                                 <td>
                                     <button class="btn btn-sm btn-outline" onclick="fecharModal('alunoModal'); setTimeout(() => carregarNotasMatricula(${m.id}), 100)">
                                         <i class="fas fa-star"></i> Ver Notas
                                     </button>
                                 </td>
                             </tr>
-                        `).join('') || '四种<td colspan="5">Nenhuma matrícula encontrada</td></tr>'}
+                        `).join('') || '<tr><td colspan="5">Nenhuma matrícula encontrada</td></tr>'}
                     </tbody>
                 </table>
             </div>
@@ -201,7 +203,7 @@ async function verAluno(id) {
 }
 
 async function removerAluno(id) {
-    if (confirm('⚠️ Tem certeza que deseja remover este aluno? Todas as matrículas e notas serão removidas!')) {
+    if (confirm('⚠️ Tem certeza que deseja remover este aluno? Alunos com histórico acadêmico não poderão ser excluídos. Prefira alterar o status.')) {
         try {
             await AlunoAPI.delete(id);
             showAlert('Aluno removido com sucesso!');
@@ -240,11 +242,16 @@ function carregarNotasMatricula(matriculaId) {
     }
 }
 
+
+// Funcoes usadas pelos botoes e buscas desta tela.
+Object.assign(window, { carregarAlunos, buscarAlunos, salvarAluno, editarAluno, verAluno, removerAluno, buscarCepAluno, limparFormAluno, fecharModal, carregarNotasMatricula });
+
 // Event Listeners
 document.getElementById('alunoForm').addEventListener('submit', salvarAluno);
-document.getElementById('cpf').addEventListener('input', (e) => formatCPF(e.target.value));
-document.getElementById('telefone').addEventListener('input', (e) => formatTelefone(e.target.value));
-document.getElementById('cep').addEventListener('input', (e) => formatCEP(e.target.value));
+document.getElementById('cpf').addEventListener('input', (e) => { e.target.value = formatCPF(e.target.value); });
+document.getElementById('telefone').addEventListener('input', (e) => { e.target.value = formatTelefone(e.target.value); });
+document.getElementById('cep').addEventListener('input', (e) => { e.target.value = formatCEP(e.target.value); });
 
 // Inicializar
 carregarAlunos();
+})();

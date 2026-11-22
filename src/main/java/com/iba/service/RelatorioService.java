@@ -10,6 +10,7 @@ import com.iba.repository.MatriculaRepository;
 import com.iba.repository.NotaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ public class RelatorioService {
     private final MatriculaRepository matriculaRepository;
     private final NotaRepository notaRepository;
 
+    @Transactional(readOnly = true)
     public RelatorioDTO gerarBoletim(Long alunoId) {
         AlunoModel aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
@@ -52,22 +54,33 @@ public class RelatorioService {
             linha.put("semestre", matricula.getSemestre());
             linha.put("status", matricula.getStatus());
             linha.put("curso", matricula.getCurso().getNome());
-            linha.put("media", matricula.getMediaFinal());
+            linha.put("media", (matricula.getStatus() == MatriculaModel.StatusMatricula.APROVADO ||
+                    matricula.getStatus() == MatriculaModel.StatusMatricula.REPROVADO)
+                    ? matricula.getMediaFinal() : null);
             
             // Detalhamento por matéria
             List<Map<String, Object>> materiasNotas = new ArrayList<>();
-            // Agrupar notas por matéria para evitar duplicação
+            // Incluir todas as matérias do curso, mesmo sem avaliação registrada.
             Map<Long, Map<String, Object>> materiasMap = new LinkedHashMap<>();
-            
+            for (var materia : matricula.getMateriasEfetivas()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("materia", materia.getNome());
+                item.put("materiaId", materia.getId());
+                item.put("ciclo1", null);
+                item.put("ciclo2", null);
+                item.put("ciclo3", null);
+                materiasMap.put(materia.getId(), item);
+            }
+
             for (var nota : matricula.getNotas()) {
                 Long materiaId = nota.getMateria().getId();
                 if (!materiasMap.containsKey(materiaId)) {
                     Map<String, Object> materiaNota = new LinkedHashMap<>();
                     materiaNota.put("materia", nota.getMateria().getNome());
                     materiaNota.put("materiaId", materiaId);
-                    materiaNota.put("ciclo1", 0.0);
-                    materiaNota.put("ciclo2", 0.0);
-                    materiaNota.put("ciclo3", 0.0);
+                    materiaNota.put("ciclo1", null);
+                    materiaNota.put("ciclo2", null);
+                    materiaNota.put("ciclo3", null);
                     materiasMap.put(materiaId, materiaNota);
                 }
                 
@@ -79,11 +92,13 @@ public class RelatorioService {
             
             // Calcular médias
             for (Map<String, Object> materiaNota : materiasMap.values()) {
-                double ciclo1 = (double) materiaNota.get("ciclo1");
-                double ciclo2 = (double) materiaNota.get("ciclo2");
-                double ciclo3 = (double) materiaNota.get("ciclo3");
-                double media = (ciclo1 + ciclo2 + ciclo3) / 3;
+                Double ciclo1 = (Double) materiaNota.get("ciclo1");
+                Double ciclo2 = (Double) materiaNota.get("ciclo2");
+                Double ciclo3 = (Double) materiaNota.get("ciclo3");
+                boolean completo = ciclo1 != null && ciclo2 != null && ciclo3 != null;
+                Double media = completo ? (ciclo1 + ciclo2 + ciclo3) / 3 : null;
                 materiaNota.put("media", media);
+                materiaNota.put("situacao", completo ? (media >= 60 ? "APROVADO" : "REPROVADO") : "PENDENTE");
                 materiasNotas.add(materiaNota);
             }
             
@@ -102,10 +117,15 @@ public class RelatorioService {
         if (matriculas.isEmpty()) return 0.0;
         
         double somaMedias = 0.0;
+        int concluidas = 0;
         for (MatriculaModel m : matriculas) {
-            somaMedias += m.getMediaFinal();
+            if (m.getStatus() == MatriculaModel.StatusMatricula.APROVADO ||
+                    m.getStatus() == MatriculaModel.StatusMatricula.REPROVADO) {
+                somaMedias += m.getMediaFinal();
+                concluidas++;
+            }
         }
-        return somaMedias / matriculas.size();
+        return concluidas == 0 ? null : somaMedias / concluidas;
     }
 
     public RelatorioDTO gerarRendimentoPorCurso() {

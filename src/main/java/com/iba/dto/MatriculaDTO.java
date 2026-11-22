@@ -22,4 +22,7 @@ public class MatriculaDTO {
     private String status;
     private Double mediaFinal;
     private List<NotaDTO> notas;
+    // Disciplinas efetivamente cursadas nesta matrícula, diferentes da grade geral do curso.
+    private List<Long> materiasIds;
+    private List<String> materiasNomes;
 }

@@ -738,3 +738,40 @@ body {
         text-align: center;
     }
 }
+/* Ajustes de acessibilidade e consistência (revisão 2026) */
+:focus-visible { outline: 3px solid #e1a72e; outline-offset: 3px; }
+.menu-item:focus-visible { outline-offset: -3px; }
+button, input, select, textarea { font: inherit; }
+button:disabled, .btn:disabled { opacity: .6; cursor: not-allowed; }
+.table-container { max-width: 100%; overflow-x: auto; }
+.data-table th { white-space: nowrap; }
+.content-container .alert { overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* Revisão de usabilidade: associação de matérias e lançamento de notas */
+.subject-picker { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:9px; padding:12px; background:var(--surface, #f8faf9); border:1px solid #d9e3de; border-radius:8px; max-height:300px; overflow-y:auto; }
+.subject-option { display:flex; gap:10px; align-items:center; padding:10px 12px; border-radius:7px; background:#fff; border:1px solid #dae4de; cursor:pointer; text-transform:none; font-weight:500; font-size:.92rem; }
+.subject-option:has(input:checked) { background:#e7f3eb; border-color:#3c835c; }
+.subject-option input { width:17px; height:17px; accent-color:#24583b; }
+.subject-option:focus-within { outline:2px solid #297653; outline-offset:1px; }
+.help-text { padding:10px 12px; border-left:3px solid #2f7250; background:#f0f7f2; color:#345444; font-size:.92rem; }
+[hidden] {display:none!important;}
+.data-table button:focus-visible {outline:2px solid #2e7350; outline-offset:2px;}
+@media(max-width:700px){.subject-picker{grid-template-columns:1fr;}}
+
+/* Refinamentos discretos — seleção de disciplinas por aluno (2026) */
+.subject-wide { grid-column: 1 / -1; }
+.subject-tools { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.form-hint { color:var(--gray-600); font-size:.85rem; line-height:1.55; margin-top:5px; }
+.subject-count { display:inline-block; padding:5px 9px; border-radius:999px; background:#edf5ee; color:#24583b; font-size:.83rem; font-weight:600; white-space:nowrap; }
+.section-rule { border:0; border-top:1px solid var(--gray-300); margin:18px 0; }
+.section-heading { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+.section-heading h3, .section-heading h4 { margin:0; }
+.subject-editor { padding:15px; border:1px solid #d6e5db; border-radius:10px; background:#f8fbf9; margin:12px 0; }
+.data-table tbody tr:hover { background:#f8fbf9; }
+.content-panel { transition:box-shadow .2s ease; }
+.content-panel:focus-within { box-shadow:0 2px 16px rgba(20,85,43,.065); }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid #2c7655; outline-offset:2px; }
+@media(max-width:600px) { .section-heading { align-items:flex-start; } .section-heading .btn { width:100%; } }

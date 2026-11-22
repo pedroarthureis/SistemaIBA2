@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/matriculas")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class MatriculaController {
 
@@ -48,6 +47,11 @@ public class MatriculaController {
     @PostMapping
     public ResponseEntity<MatriculaDTO> create(@Valid @RequestBody MatriculaDTO matriculaDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(matriculaDTO));
+    }
+
+    @PutMapping("/{id}/materias")
+    public ResponseEntity<MatriculaDTO> updateMaterias(@PathVariable Long id, @RequestBody List<Long> materiasIds) {
+        return ResponseEntity.ok(service.updateMaterias(id, materiasIds));
     }
 
     @PatchMapping("/{id}/status")

@@ -50,6 +50,21 @@ public class MatriculaModel {
     @JsonIgnore
     private List<NotaModel> notas = new ArrayList<>();
 
+    // Associações individuais: um aluno pode cursar apenas parte da grade de seu curso.
+    // Matrículas antigas não possuem linhas nessa tabela e usam a grade do curso (compatibilidade).
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "matricula_materia",
+        joinColumns = @JoinColumn(name = "matricula_id"),
+        inverseJoinColumns = @JoinColumn(name = "materia_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"matricula_id", "materia_id"}))
+    @JsonIgnore
+    private List<MateriaModel> materias = new ArrayList<>();
+
+    public List<MateriaModel> getMateriasEfetivas() {
+        return materias != null && !materias.isEmpty() ? materias :
+            (curso != null && curso.getMaterias() != null ? curso.getMaterias() : List.of());
+    }
+
     @Transient
     private Double mediaFinal;
 

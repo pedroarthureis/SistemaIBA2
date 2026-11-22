@@ -57,3 +57,7 @@ application-dev.properties
 # Node
 node_modules/
 package-lock.json
+# Cópias de dados sensíveis / backups locais
+backups/
+*.dump
+*.backup
